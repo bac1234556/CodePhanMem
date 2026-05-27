@@ -1,4 +1,3 @@
-
 # student-mentor-matching-system
 
 # Hệ Thống Kết Nối Học Tập Và Định Hướng Nghề Nghiệp Mentor Hub
@@ -36,7 +35,7 @@ Hệ thống hướng tới việc hiện thực hóa các mục tiêu sau:
 
 ## 3. Phân Rã Chức Năng Nghiệp Vụ
 
-### 3.1. Nhóm Chức Năng Cho Học Viên 
+### 3.1. Nhóm Chức Năng Cho Học Viên
 
 * Khám phá danh mục môn học và cây kỹ năng chuyên ngành.
 * Tìm kiếm nâng cao và lọc bộ lọc Mentor theo: chuyên môn, mức phí/phút, xếp hạng (số sao) và trạng thái hoạt động (Online/Offline).
@@ -101,7 +100,7 @@ Hệ thống hướng tới việc hiện thực hóa các mục tiêu sau:
 
 Dự án áp dụng mô hình kiến trúc **Modular Monolith kết hợp AI Service riêng biệt**.
 
-Phần Backend chính viết bằng C# .NET được chia nhỏ thành các module nghiệp vụ biệt lập về mặt logic. Cách thiết kế này giúp nhóm phát triển kiểm soát mã nguồn tốt, dễ dàng nâng cấp lên Microservices trong tương lai mà không làm phức tạp hóa hạ tầng ở giai đoạn đầu.
+Phần Backend chính được xây dựng bằng **Java (Spring Boot)** áp dụng cấu trúc **Multi-Module**, chia nhỏ các tầng và phân tách module nghiệp vụ một cách chặt chẽ về mặt logic. Thiết kế này hỗ trợ làm việc nhóm song song hiệu quả, dễ dàng nâng cấp lên Microservices trong tương lai mà không làm phức tạp hóa hạ tầng ở giai đoạn đầu.
 
 Khối AI Service do sử dụng hệ sinh thái Python nên được tách riêng thành một dịch vụ độc lập kết nối qua giao thức RESTful API.
 
@@ -111,17 +110,15 @@ Client Applications (Giao Diện Người Dùng)
 └── Admin & Mentor Console (Cố vấn & Quản trị)
         |
         v
-ASP.NET Core Backend - Modular Monolith (C#)
-├── Identity Module (Định danh & Xác thực)
-├── Profile Module (Hồ sơ & Minh chứng)
-├── Session Module (Điều phối ca học & Lịch hẹn)
-├── Wallet Module (Xử lý ví & Giao dịch thanh toán)
-├── Notification Module (Hệ thống thông báo & Telegram Alert)
-└── Admin Dashboard Module (Báo cáo & Kiểm duyệt)
+Spring Boot Backend - Modular Monolith (Java Multi-Module)
+├── mentor-web (REST Controllers, Security Config, WebSocket Endpoint)
+├── mentor-application (Mục tiêu nghiệp vụ: Use Cases, DTOs, Services)
+├── mentor-infrastructure (Hạ tầng: Spring Data JPA, Redis Cache, WebSocket Handler)
+└── mentor-domain (Nghiệp vụ lõi: Entities, Value Objects, Domain Interfaces)
         |
         ├── PostgreSQL (Cơ sở dữ liệu quan hệ)
-        ├── Redis (Lưu trạng thái Online/Offline & Cache Session)
-        └── SignalR Hub (Cổng truyền thông thời gian thực)
+        ├── Redis (Lưu trạng thái Online/Offline & Cache Session cuộc gọi)
+        └── Spring WebSocket / STOMP Hub (Cổng truyền thông thời gian thực)
         |
         v
 FastAPI AI RAG Service (Python)
@@ -144,19 +141,20 @@ FastAPI AI RAG Service (Python)
 * Quản lý trạng thái server: TanStack Query (React Query)
 * Quản lý trạng thái client: Zustand
 * Biểu mẫu & Kiểm thử dữ liệu: React Hook Form tích hợp Zod Validation
-* Kết nối thời gian thực: SignalR Client SDK
+* Kết nối thời gian thực: SockJS / STOMP Client (Giao tiếp với Spring WebSocket)
 * Truyền tải âm thanh/hình ảnh: WebRTC API / Agora SDK
 
 ### 5.2. Backend
 
-* Công nghệ cốt lõi: ASP.NET Core 8 / 9
-* Kiến trúc truy cập dữ liệu: Entity Framework Core (Code First)
+* Công nghệ cốt lõi: Java 17 hoặc Java 21 / Spring Boot 3.x
+* Kiến trúc truy cập dữ liệu: Spring Data JPA (Hibernate) & Spring JDBC
 * Hệ quản trị cơ sở dữ liệu: PostgreSQL
-* Xử lý Socket/Realtime: SignalR Hub
-* Cơ chế bảo mật: JWT Authentication & Role-Based Authorization
-* Kiểm định dữ liệu đầu vào: FluentValidation
-* Ghi nhật ký hệ thống: Serilog xuất dữ liệu ra file và console
-* Tài liệu hóa API: Swagger / OpenAPI Specification
+* Xử lý Socket/Realtime: Spring WebSocket (STOMP Protocol)
+* Cơ chế bảo mật: Spring Security kết hợp JJWT (Java JWT) & Role-Based Authorization
+* Kiểm định dữ liệu đầu vào: Jakarta Bean Validation (Hibernate Validator)
+* Ghi nhật ký hệ thống: SLF4J & Logback
+* Lập lịch tác vụ ngầm (Scheduler): Spring `@Scheduled` (Xử lý quét trừ tiền)
+* Tài liệu hóa API: SpringDoc OpenAPI (Swagger UI)
 
 ### 5.3. AI Service
 
@@ -170,11 +168,11 @@ FastAPI AI RAG Service (Python)
 
 ### 5.4. Vận Hành DevOps
 
-* Công nghệ đóng gói: Docker & Docker Image Optimization
+* Công nghệ đóng gói: Docker & Jib (Tối ưu hóa Docker Image cho Java)
 * Điều phối hạ tầng local: Docker Compose
 * Hệ thống CI/CD: GitHub Actions Tự động hóa quy trình
 * Máy chủ Proxy ngược: Nginx đảm nhận điều phối cổng và SSL
-* Kiểm tra sức khỏe hệ thống: ASP.NET Core Health Checks
+* Kiểm tra sức khỏe hệ thống: Spring Boot Actuator (`/actuator/health`)
 * Hệ thống thông báo khẩn cấp: Telegram Bot API tích hợp luồng Deploy/Error
 * Tự động hóa sao lưu: Bash Script tự động backup định kỳ PostgreSQL
 
@@ -182,32 +180,37 @@ FastAPI AI RAG Service (Python)
 
 ## 6. Tổ Chức Cấu Trúc Thư Mục Repository
 
+Sử dụng kiến trúc **Maven Multi-Module** giúp phân định ranh giới rõ ràng giữa các phần của hệ thống:
+
 ```text
 mentor-hub-system/
 │
-├── MentorHubSystem.sln
-│
 ├── docs/
-│   ├── agent-briefing.md
 │   ├── architecture.md
 │   ├── api-contract.md
 │   ├── db-schema.md
-│   ├── ui-flow.md
-│   ├── git-workflow-guide.md
-│   ├── demo-script.md
-│   └── issue-template.md
+│   └── git-workflow-guide.md
 │
 ├── backend/
 │   └── mentor-api/
-│       ├── src/
-│       │   ├── MentorHub.Api/
-│       │   ├── MentorHub.Application/
-│       │   ├── MentorHub.Domain/
-│       │   └── MentorHub.Infrastructure/
+│       ├── pom.xml                        # Parent POM: Quản lý version thư viện chung
 │       │
-│       └── tests/
-│           ├── MentorHub.UnitTests/
-│           └── MentorHub.IntegrationTests/
+│       ├── mentor-domain/                 # Lớp thực thể và logic cốt lõi (Entities, Enums)
+│       │   ├── src/main/java/vn/edu/cmc/mentorhub/domain/
+│       │   └── pom.xml
+│       │
+│       ├── mentor-application/            # Lớp xử lý Use Cases, Business Logic
+│       │   ├── src/main/java/vn/edu/cmc/mentorhub/application/
+│       │   └── pom.xml
+│       │
+│       ├── mentor-infrastructure/         # Lớp kết nối DB (JPA), Cấu hình Redis, WebSocket
+│       │   ├── src/main/java/vn/edu/cmc/mentorhub/infrastructure/
+│       │   └── pom.xml
+│       │
+│       └── mentor-web/                    # Cổng tiếp nhận Request (Controllers, Security Filter)
+│           ├── src/main/java/vn/edu/cmc/mentorhub/web/
+│           ├── src/main/resources/        # application.yml
+│           └── pom.xml
 │
 ├── frontend/
 │   ├── mentee-web/
@@ -215,16 +218,10 @@ mentor-hub-system/
 │
 ├── services/
 │   └── ai-service/
-│       ├── app/
-│       ├── knowledge_base/
-│       ├── requirements.txt
-│       ├── Dockerfile
-│       └── README.md
 │
 ├── infrastructure/
 │   ├── docker-compose.local.yml
-│   ├── nginx/
-│   └── scripts/
+│   └── nginx/
 │
 ├── .github/
 │   └── workflows/
@@ -236,41 +233,27 @@ mentor-hub-system/
 
 ---
 
-## 7. Tổ Chức Các Module Ở Khối Backend
+## 7. Tổ Chức Các Module Gói Nghiệp Vụ Ở Khối Backend
 
-Mã nguồn Backend nằm gọn trong một ứng dụng ASP.NET Core nhưng phân chia cấu trúc thư mục nghiêm ngặt theo các Module nghiệp vụ độc lập:
+Bên trong các module `mentor-application` và `mentor-infrastructure`, mã nguồn tiếp tục được phân tách nghiêm ngặt thành các package nghiệp vụ. Cách chia này cho phép một team 5 người có thể phân chia công việc độc lập, không bị chồng chéo code.
 
 ```text
-MentorHub.Api/
-├── Modules/
-│   ├── Identity/
-│   ├── Profile/
-│   ├── Session/
-│   ├── Wallet/
-│   ├── Notification/
-│   └── Dashboard/
-│
-├── Shared/
-│   ├── Auth/
-│   ├── Database/
-│   ├── Realtime/
-│   ├── Exceptions/
-│   └── Common/
-│
-├── Controllers/
-├── Program.cs
-└── appsettings.json
+vn.edu.cmc.mentorhub.application/
+├── shared/                       # Các xử lý dùng chung (Exception, Utils, DTO nền)
+├── identity/                     # Gói nghiệp vụ Định danh & Đăng ký tài khoản
+├── profile/                      # Gói nghiệp vụ Hồ sơ Mentor, cây kỹ năng, bảng điểm
+├── session/                      # Gói nghiệp vụ Lịch hẹn, Kết nối phòng học WebRTC
+├── wallet/                       # Gói nghiệp vụ Ví điện tử, Micro-billing, Đối soát doanh thu
+└── notification/                 # Gói nghiệp vụ Bắn thông báo qua Web và Telegram Bot
 
 ```
-
-| Tên Module | Trách nhiệm xử lý chi tiết |
+| Tên Package | Trách nhiệm xử lý chi tiết |
 | --- | --- |
-| **Identity** | Cấp phát khóa JWT, thiết lập xác thực, phân quyền Mentee/Mentor/Admin, đăng ký tài khoản. |
-| **Profile** | Lưu trữ hồ sơ, quản lý cây kỹ năng/môn học, xử lý tệp tin đính kèm (bảng điểm, chứng chỉ). |
-| **Session** | Điều phối lịch hẹn, tạo phòng học trực tuyến, xử lý logic trạng thái phòng học WebRTC. |
-| **Wallet** | Quản lý ví điện tử, sinh mã nạp tiền, xử lý logic trừ tiền theo phút và chia sẻ doanh thu tự động. |
-| **Notification** | Bắn thông báo đẩy (Push Notification) trên web và kích hoạt Bot Telegram báo động hệ thống. |
-| **Dashboard** | Tổng hợp số liệu từ các module, tính toán biểu đồ doanh thu và cung cấp dữ liệu báo cáo cho Admin. |
+| **identity** | Xử lý Authentication (Spring Security), phân quyền Mentee/Mentor/Admin, cấp phát và xác thực JWT. |
+| **profile** | Quản lý thông tin cá nhân, cây danh mục môn học, lưu trữ minh chứng năng lực (bằng cấp, bảng điểm). |
+| **session** | Quản lý vòng đời ca học: Điều phối tín hiệu kết nối, xử lý logic trạng thái phòng học WebRTC (`PENDING`, `CONNECTED`, `FINISHED`). |
+| **wallet** | Quản lý ví điện tử, xử lý trừ tiền tự động sử dụng `@Scheduled` (Micro-billing), tự động phân chia chiết khấu sàn và quyết toán thu nhập cho Mentor. |
+| **notification** | Quản lý kênh truyền thông báo: Gửi tin nhắn real-time qua WebSocket STOMP và đẩy các cảnh báo về hệ thống Telegram Bot. |
 
 ---
 
@@ -287,11 +270,11 @@ Mentee truy cập, tìm kiếm theo bộ lọc môn học -> Hệ thống hiển
         |
 Mentee bấm nút "GỌI CỐ VẤN" -> Hệ thống kiểm tra số dư ví khả dụng
         |
-Tín hiệu realtime được bắn qua SignalR -> Màn hình Mentor đổ chuông báo
+Tín hiệu realtime được bắn qua Spring WebSocket -> Màn hình Mentor đổ chuông báo
         |
 Mentor bấm "CHẤP NHẬN" -> Khởi tạo phòng WebRTC và kích hoạt bộ đếm thời gian
         |
-Phiên học diễn ra -> Định kỳ mỗi phút hệ thống tạm tính tiền theo block thời gian
+Phiên học diễn ra -> Định kỳ mỗi phút Job Scheduler trừ tiền theo block thời gian
         |
 Một trong hai bên cúp máy hoặc Mentee hết tiền -> Ngắt kết nối phòng học
         |
@@ -305,43 +288,40 @@ Học viên đặt câu hỏi cho AI RAG để tự ôn tập kiến thức nề
 
 ---
 
-## 9. Cơ Chế Xử Lý Thời Thực 
+## 9. Cơ Chế Xử Lý Thời Thực
 
-Tất cả các tương tác trực tiếp được thiết lập qua **SignalR Hub** nhằm đảm bảo độ trễ tối thiểu.
+Tất cả các tương tác trực tiếp được thiết lập qua **Spring WebSocket (STOMP Protocol)** nhằm đảm bảo độ trễ tối thiểu và phản hồi ngay lập tức.
 
 ### 9.1. Các sự kiện truyền tải chính
 
 ```text
-MentorOnlineStatusChanged  // Thông báo danh sách cố vấn vừa cập nhật trạng thái hoạt động
-IncomingCallReceived      // Gửi tín hiệu đổ chuông và thông tin cuộc gọi đến cho Mentor
-CallRequestRejected        // Thông báo cho Mentee biết Mentor đã từ chối hoặc bận máy
-CallSessionEstablished     // Kích hoạt kết nối thành công, bắt đầu đồng bộ hóa luồng WebRTC
-BillingTickProcessed      // Gửi thông báo cập nhật số tiền hiện tại và thời gian đã trôi qua theo từng phút
-CallSessionTerminated      // Đồng bộ ngắt kết nối khi kết thúc phiên học
-WalletBalanceUpdated       // Cập nhật biến động số dư tức thời trên màn hình người dùng
+/topic/mentor-status     // Kênh Broadcast: Cập nhật danh sách cố vấn đang Online/Offline
+/user/queue/calls        // Kênh Cá nhân: Gửi tín hiệu đổ chuông đến một Mentor cụ thể
+/user/queue/call-replies // Kênh Cá nhân: Báo cho Mentee biết Mentor chấp nhận/từ chối
+/topic/session/{id}      // Kênh Phòng học: Trao đổi SDP/ICE candidates cho WebRTC
+/user/queue/billing      // Kênh Cá nhân: Gửi thông báo cập nhật số dư ví sau mỗi phút
 
 ```
-
 ### 9.2. Kịch bản kiểm thử realtime
 
 * **Kịch bản 1**: Mentor bấm bật Online, lập tức trên màn hình tìm kiếm của Mentee, thẻ hồ sơ của Mentor chuyển từ xám sang xanh sáng mà không cần tải lại trang.
-* **Kịch bản 2**: Mentee bấm gọi, màn hình Mentor lập tức xuất hiện Pop-up đổ chuông đi kèm hiệu ứng âm thanh thời gian thực. Nếu quá 30 giây không phản hồi, hệ thống tự động hủy cuộc gọi.
+* **Kịch bản 2**: Mentee bấm gọi, màn hình Mentor lập tức xuất hiện Pop-up đổ chuông đi kèm hiệu ứng âm thanh. Nếu quá 30 giây không phản hồi, hệ thống tự động hủy cuộc gọi.
 * **Kịch bản 3**: Trong lúc ca học đang diễn ra, đồng hồ đếm ngược chạy đồng thời với việc số dư tài khoản của Mentee giảm dần sau mỗi phút, hiển thị trực quan lên giao diện.
 
 ---
 
 ## 10. Giải Pháp Trí Tuệ Nhân Tạo AI RAG Pipeline
 
-Khối dịch vụ AI Service chạy độc lập dưới dạng một REST API gọn nhẹ cấu hình bằng FastAPI.
+Khối dịch vụ AI Service chạy độc lập dưới dạng một REST API gọn nhẹ cấu hình bằng FastAPI (Python).
 
 ### 10.1. Kho tri thức nguồn
 
 ```text
 services/ai-service/knowledge_base/
-├── quy_che_dao_tao_tin_chi.md   // Các quy định về học vụ, điểm số, điều kiện cảnh cáo, tốt nghiệp
-├── de_cuong_lap_trinh_csharp.md // Chi tiết môn học C#, cấu trúc đề thi, các chương mục trọng tâm
+├── quy_che_dao_tao_tin_chi.md   // Các quy định về học vụ, điểm số, điều kiện tốt nghiệp
+├── de_cuong_lap_trinh_java.md   // Chi tiết môn học Java Backend, cấu trúc đề thi
 ├── tai_lieu_xac_suat_thong_ke.md// Đề cương và các dạng bài tập toán xác suất thống kê mẫu
-├── chính_sach_mentor_hub.md     // Quy định về tỷ lệ chiết khấu tài chính, quy tắc ứng xử sàn
+├── chính_sach_mentor_hub.md     // Quy định về tỷ lệ chiết khấu tài chính, quy tắc ứng xử
 └── cau_hoi_thuong_gap_faq.md    // Tổng hợp các thắc mắc phổ biến của sinh viên
 
 ```
@@ -352,11 +332,11 @@ services/ai-service/knowledge_base/
 Sinh viên gửi câu hỏi cần tư vấn lộ trình học hoặc ôn thi
 → FastAPI tiếp nhận Payload yêu cầu
 → Gọi mô hình nhúng tạo Vector Embedding cho câu hỏi đầu vào
-→ Thực hiện tìm kiếm tương đồng ngữ nghĩa (Similarity Search) trên ChromaDB / FAISS
-→ Trích xuất ra các đoạn văn bản (Chunks) chứa tri thức liên quan nhất từ file tài liệu (.md)
-→ Đóng gói Context (Bối cảnh trích xuất) + Câu hỏi gốc vào một System Prompt mẫu
+→ Thực hiện tìm kiếm tương đồng (Similarity Search) trên ChromaDB / FAISS
+→ Trích xuất ra các đoạn văn bản (Chunks) chứa tri thức liên quan nhất
+→ Đóng gói Context (Bối cảnh trích xuất) + Câu hỏi gốc vào System Prompt
 → Đẩy Prompt sang Gemini API để xử lý sinh văn bản
-→ Gemini trả ra câu trả lời chuẩn xác, có trích dẫn nguồn dữ liệu thực tế
+→ Gemini trả ra câu trả lời chuẩn xác, có trích dẫn nguồn
 → FastAPI trả kết quả định dạng JSON về giao diện Client
 
 ```
@@ -364,10 +344,10 @@ Sinh viên gửi câu hỏi cần tư vấn lộ trình học hoặc ôn thi
 ### 10.3. Thiết Kế Danh Sách API AI
 
 ```text
-POST /api/v1/ai/academy-consultant // Trực tiếp tư vấn giải đáp kiến thức môn học và ôn thi cho Mentee
-POST /api/v1/ai/career-pathfinder  // Tiếp nhận mục tiêu để sinh ra lộ trình học tập cá nhân hóa
-POST /api/v1/ai/cv-screening       // Phân tích cấu trúc CV, bảng điểm Mentor phục vụ cho khâu kiểm duyệt của Admin
-POST /api/v1/ai/vector-reindex     // Lệnh từ Admin yêu cầu quét lại kho tri thức khi có tài liệu mới cập nhật
+POST /api/v1/ai/academy-consultant // Tư vấn giải đáp kiến thức môn học và ôn thi cho Mentee
+POST /api/v1/ai/career-pathfinder  // Tiếp nhận mục tiêu sinh ra lộ trình học tập cá nhân hóa
+POST /api/v1/ai/cv-screening       // Phân tích cấu trúc CV, bảng điểm Mentor phục vụ kiểm duyệt
+POST /api/v1/ai/vector-reindex     // Admin yêu cầu quét lại kho tri thức khi có tài liệu mới
 GET  /health                       // Endpoint kiểm tra trạng thái sống của dịch vụ AI
 
 ```
@@ -377,21 +357,19 @@ GET  /health                       // Endpoint kiểm tra trạng thái sống c
 ## 11. Chiến Lược Vận Hành DevOps & Triển Khai
 
 ### 11.1. Các thành phần hạ tầng
-
-* **Docker hóa**: Toàn bộ hệ thống được chia làm 4 container chính: `mentor-backend-api`, `mentor-ai-service`, `mentee-frontend`, `admin-mentor-frontend`.
-* **Hạ tầng bổ trợ**: Sử dụng các Container chính hãng được cấu hình sẵn cho `postgres:16-alpine` và `redis:7-alpine`.
-* **Nginx Proxy**: Đứng ở cổng ngoài chịu trách nhiệm phân định luồng: các request bắt đầu bằng `/api` hướng về phía Backend, `/ai` hướng về Python Service, còn lại điều hướng về các nhánh Frontend tương ứng.
+* **Docker hóa**: 4 container chính: `mentor-backend-api` (build qua Maven/Jib), `mentor-ai-service`, `mentee-frontend`, `admin-mentor-frontend`.
+* **Hạ tầng bổ trợ**: Container `postgres:16-alpine` và `redis:7-alpine`.
+* **Nginx Proxy**: Phân luồng các request `/api` về Java Backend, `/ai` về Python Service, còn lại hướng về các nhánh Frontend.
 
 ### 11.2. Quy trình tích hợp liên tục CI
 
 ```text
 Thành viên tạo Pull Request (PR) đi vào nhánh 'develop'
 → Kích hoạt GitHub Actions Runner
-→ Thực hiện khôi phục gói (Nuget Restore / Pip Install / Npm Install)
-→ Thực hiện Build kiểm tra lỗi cú pháp trên toàn bộ các project
-→ Khởi chạy toàn bộ hệ thống Unit Test và Integration Test ở Backend
-→ Thực hiện Linting kiểm tra chuẩn định dạng mã nguồn Python
-→ Nếu tất cả các bước trả về mã màu xanh (Pass) -> Cho phép Reviewer bấm Merge code
+→ Maven thực hiện tải dependency và Build toàn bộ Multi-module
+→ Khởi chạy toàn bộ hệ thống Unit Test và Integration Test ở Backend (JUnit/Mockito)
+→ Thực hiện Linting kiểm tra chuẩn định dạng mã nguồn Python (Flake8/Black)
+→ Nếu tất cả các bước Pass -> Cho phép Reviewer bấm Merge code
 
 ```
 
@@ -400,11 +378,11 @@ Thành viên tạo Pull Request (PR) đi vào nhánh 'develop'
 ```text
 Khi code được hợp nhất thành công vào nhánh chính 'main'
 → GitHub Actions kích hoạt tiến trình đóng gói Docker Image
-→ Đẩy các Image đã được gắn thẻ phiên bản lên Docker Hub (hoặc GitHub Packages)
-→ Kết nối tự động tới máy chủ VPS thông qua giao thức bảo mật SSH
-→ Di chuyển vào thư mục hạ tầng và thực hiện lệnh: docker compose pull && docker compose up -d
-→ Chạy lệnh script tự động kiểm tra endpoint /health của Backend và AI Service
-→ Nếu hệ thống sống khỏe, kích hoạt Webhook gửi tin nhắn chúc mừng triển khai thành công về nhóm Telegram
+→ Đẩy các Image lên Docker Hub / GitHub Packages
+→ Kết nối tự động tới máy chủ VPS thông qua SSH
+→ Kéo ảnh mới: docker compose pull && docker compose up -d
+→ Chạy script kiểm tra /actuator/health của Spring Boot và /health của FastAPI
+→ Nếu hệ thống sống khỏe, bắn Webhook thông báo thành công về nhóm Telegram
 
 ```
 
@@ -415,11 +393,12 @@ Khi code được hợp nhất thành công vào nhánh chính 'main'
 ### 12.1. Công Cụ Bắt Buộc
 
 * Hệ thống quản lý mã nguồn: **Git**
-* Môi trường ảo hóa: **Docker Desktop** (Đã tích hợp sẵn Docker Compose)
-* Bộ phát triển phần mềm: **.NET SDK 8 / 9**
+* Môi trường ảo hóa: **Docker Desktop**
+* Bộ phát triển phần mềm: **Java JDK 17 hoặc 21**
+* Trình quản lý gói Java: **Maven**
 * Môi trường chạy NodeJS: **Node.js LTS**
-* Ngôn ngữ lập trình: **Python 3.11 hoặc cao hơn**
-* Trình biên dịch khuyên dùng: **Visual Studio 2022** hoặc **VS Code**
+* Ngôn ngữ AI: **Python 3.11+**
+* Trình biên dịch khuyên dùng: **IntelliJ IDEA** (Cho Backend) và **VS Code** (Cho Frontend/AI)
 
 ### 12.2. Tải Mã Nguồn
 
@@ -437,31 +416,30 @@ docker ps
 
 ```
 
-Đảm bảo hai container sau đang chạy ổn định:
+Đảm bảo `mentor-postgres` (5432) và `mentor-redis` (6379) đang chạy.
 
-* `mentor-postgres` (Cổng 5432)
-* `mentor-redis` (Cổng 6379)
+### 12.4. Khởi Động Backend API (Java Spring Boot)
 
-### 12.4. Khởi Động Backend API
+Mở toàn bộ thư mục `backend/mentor-api` bằng IntelliJ IDEA (IDE sẽ tự động nhận diện cấu trúc Maven Multi-Module).
 
-Mở tệp giải pháp bằng Visual Studio: `MentorHubSystem.sln` và chọn `MentorHub.Api` làm Startup Project rồi nhấn `F5`.
-
-Hoặc thực thi thông qua giao diện dòng lệnh Terminal:
+Hoặc chạy thông qua Terminal bằng Maven:
 
 ```bash
-dotnet build MentorHubSystem.sln
-dotnet run --project backend/mentor-api/src/MentorHub.Api/MentorHub.Api.csproj
+cd backend/mentor-api
+mvn clean install
+mvn spring-boot:run -pl mentor-web
 
 ```
+
+Server Spring Boot sẽ khởi chạy ở cổng mặc định (ví dụ: `8080` hoặc cấu hình riêng ở `.env`).
 
 ### 12.5. Cài Đặt AI Service
 
 ```bash
 cd services/ai-service
 python -m venv .venv
-# Kích hoạt môi trường ảo trên Windows:
-.venv\Scripts\activate
-# Kích hoạt trên MacOS/Linux: source .venv/bin/activate
+# Kích hoạt môi trường ảo:
+.venv\Scripts\activate # (Windows) hoặc source .venv/bin/activate (Mac/Linux)
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 
@@ -478,7 +456,7 @@ npm run dev
 
 ```
 
-Khởi chạy Giao diện dành cho Cố vấn và Quản trị viên (Admin & Mentor Dashboard):
+Khởi chạy Giao diện dành cho Cố vấn và Quản trị viên:
 
 ```bash
 cd frontend/admin-mentor-web
@@ -491,7 +469,7 @@ npm run dev
 
 ## 13. Danh Sách Quản Lý Biến Môi Trường (`.env`)
 
-Tạo tệp cấu hình `.env` tại thư mục gốc dựa trên mẫu `.env.example` dưới đây:
+Tạo tệp cấu hình `.env` tại thư mục gốc dựa trên mẫu `.env.example`:
 
 ```env
 # Cấu hình kết nối cơ sở dữ liệu quan hệ PostgreSQL
@@ -501,57 +479,53 @@ POSTGRES_DB=mentor_hub_db
 POSTGRES_PORT=5432
 
 # Điểm neo cổng kết nối dịch vụ
-BACKEND_PORT=5001
+SPRING_SERVER_PORT=8080
 AI_SERVICE_PORT=8000
 
-# Cấu hình bảo mật và khóa xác thực danh tính
-JWT_SECRET=super-secret-key-for-mentor-hub-system-architecture-2026
+# Cấu hình bảo mật và khóa xác thực danh tính (JJWT)
+JWT_SECRET=super-secret-key-for-mentor-hub-system-architecture-2026-java
 JWT_EXPIRY_DAYS=7
 
 # Khóa bảo mật kết nối dịch vụ trí tuệ nhân tạo lõi
 GEMINI_API_KEY=AIzaSyYourActualGeminiKeyHere_To_Be_Changed
 
-# Cấu hình cổng thông báo thông tin tự động qua Telegram Bot
+# Cấu hình cổng thông báo qua Telegram Bot
 TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ
 TELEGRAM_CHAT_ID=-987654321
 
 ```
 
-*Tuyệt đối nghiêm cấm việc commit tệp tin chứa mật khẩu thực tế lên các kho lưu trữ mã nguồn chung.*
+*Tuyệt đối nghiêm cấm việc commit tệp tin chứa mật khẩu thực tế lên GitHub.*
 
 ---
 
 ## 14. Mô Hình Quản Lý Nhánh Git Workflow
 
-Dự án áp dụng mô hình phân nhánh chuẩn để quản lý tiến độ:
+Dự án áp dụng mô hình phân nhánh chuẩn:
 
 ```text
-main      -> Nhánh phân phối chính thức, chỉ chứa code đã đóng gói ổn định để đem đi demo
-develop   -> Nhánh tích hợp trung tâm, nơi toàn bộ các tính năng mới được gom về để kiểm thử
-feature/* -> Nhánh tính năng biệt lập, phân tách theo từng Issue cụ thể được giao cho thành viên
+main      -> Nhánh phân phối chính thức (Môi trường Production/Demo)
+develop   -> Nhánh tích hợp trung tâm kiểm thử
+feature/* -> Nhánh tính năng biệt lập theo Issue
 
 ```
 
-Quy trình phát triển một tính năng tiêu chuẩn:
+Quy trình phát triển một tính năng:
 
 ```bash
 git checkout develop
 git pull origin develop
-git checkout -b feature/issue-10-connect-signalr-hub
+git checkout -b feature/issue-10-connect-websocket-stomp
 
-# Thực hiện viết code và chạy test kiểm thử tại môi trường máy cục bộ local
+# Lập trình, test local
 
 git add .
-git commit -m "feat: triển khai kết nối hoàn chỉnh cổng tín hiệu SignalR Hub"
-git push -u origin feature/issue-10-connect-signalr-hub
+git commit -m "feat: triển khai kết nối hoàn chỉnh cổng tín hiệu WebSocket STOMP"
+git push -u origin feature/issue-10-connect-websocket-stomp
 
 ```
 
-Tiến hành truy cập vào GitHub để khởi tạo một yêu cầu kéo mã (**Pull Request**):
-`feature/issue-10-connect-signalr-hub` → `develop`
-
-Sau khi toàn bộ mã nguồn trên `develop` hoạt động ổn định và bước vào giai đoạn kết thúc môn học:
-`develop` → `main`
+Tạo **Pull Request**: `feature/*` → `develop`. Khi hoàn thiện đồ án: `develop` → `main`.
 
 ---
 
@@ -559,55 +533,49 @@ Sau khi toàn bộ mã nguồn trên `develop` hoạt động ổn định và b
 
 ### 15.1. Định Nghĩa Issue
 
-Mọi công việc trong dự án bắt buộc phải được mô tả thông qua hệ thống Issue trên GitHub. Mỗi Issue phải làm rõ các cấu phần:
+Mỗi Issue trên GitHub phải bao gồm:
 
-* **Mục tiêu**: Mô tả ngắn gọn tính năng cần làm.
-* **Phạm vi tác động**: Nêu rõ những thư mục, lớp dữ liệu hoặc module nào sẽ bị chỉnh sửa.
-* **API Contract liên quan**: Định nghĩa rõ cấu trúc Request/Response nếu có làm việc với Endpoint mới.
-* **Tiêu chí chấp nhận (Acceptance Criteria)**: Các bước cụ thể để kiểm tra xem tính năng đã chạy đúng yêu cầu chưa.
-* **Định nghĩa hoàn thành (Definition of Done)**: Mã nguồn không lỗi cú pháp, đã chạy test local thành công, không chứa secret key và đã cập nhật tài liệu liên quan.
+* **Mục tiêu**: Tính năng cần làm.
+* **Phạm vi tác động**: Module nào trong kiến trúc Maven bị chỉnh sửa (vd: `mentor-application`, `mentor-infrastructure`).
+* **API Contract**: Cấu trúc Request/Response nếu có Endpoint mới.
+* **Định nghĩa hoàn thành**: Build Maven thành công, Pass Unit Test, không lộ Secret.
 
 ### 15.2. Quy trình tạo Pull Request
 
-Khi lập trình viên hoàn thành một Issue, họ sẽ tạo một Pull Request gửi lên nhóm. Mẫu mô tả PR bắt buộc phải tuân thủ cấu trúc:
+Mẫu mô tả PR bắt buộc:
 
 ```markdown
 ## Tóm tắt nội dung thay đổi
+- Bổ sung cấu hình WebSocketConfig trong mentor-infrastructure
+- Thêm filter chặn Token JWT trên luồng Socket ở mentor-web
 
 ## Khớp nối Issue liên quan
 Closes #10
 
-## Danh sách các chỉnh sửa cốt lõi
-- Bổ sung cấu trúc lưu trữ Hub trong Shared/Realtime
-- Thiết lập cấu hình CORS cho phép kết nối Socket từ Frontend
-
-## Các bước thực hiện kiểm thử nghiệm thu (Cách test)
-
 ## Bảng kiểm tra điều kiện (Checklist)
-- [ ] Code đã biên dịch thành công (Build Pass)
-- [ ] Đã chạy qua các kịch bản kiểm thử (Test Pass)
-- [ ] Không vô tình commit tệp cấu hình chứa mã mật khẩu thật
-- [ ] Đã đồng bộ tài liệu kiến trúc API contract nếu có thay đổi cấu trúc dữ liệu
+- [ ] Code đã biên dịch thành công (Maven Build Pass)
+- [ ] Đã chạy qua các kịch bản kiểm thử (JUnit Test Pass)
+- [ ] Không vô tình commit cấu hình mật khẩu thật
 
 ```
 
 ---
 
-## 16. Kế Hoạch Khởi Tạo Các Khối Công Việc Ban Đầu 
+## 16. Kế Hoạch Khởi Tạo Các Khối Công Việc Ban Đầu
 
-Dưới đây là danh sách các Issue nền tảng cần được tạo lập ngay trên GitHub để phân chia:
+Danh sách các Issue nền tảng cần phân chia ngay cho đội ngũ 5 thành viên:
 
 ```text
-[ARCH] Thiết lập cấu trúc tài liệu kiến trúc tổng thể, API Contract và sơ đồ thực thể DB ban đầu.
+[ARCH] Thiết lập cấu trúc Multi-Module Maven, file pom.xml cha và các pom.xml con.
 [DEVOPS] Khởi tạo tệp cấu hình Docker Compose thiết lập môi trường Postgres và Redis cho local.
-[BE] Tạo giải pháp phần mềm (.sln) và cấu trúc các thư mục dự án theo mô hình Modular Monolith.
-[BE] Thiết lập hệ thống định danh, phân quyền Identity Module và cấu hình cấp phát mã khóa JWT.
-[BE] Thiết lập Entity Framework Core cấu hình ánh xạ dữ liệu xuống hệ thống PostgreSQL.
-[FE] Khởi tạo cấu trúc dự án Mentee Web Client sử dụng Next.js và Tailwind CSS.
-[FE] Khởi tạo cấu trúc dự án Admin & Mentor Console Dashboard sử dụng React.js.
+[BE] Thiết lập hệ thống cấu trúc gói (package) và kết nối Spring Data JPA với PostgreSQL.
+[BE] Xây dựng Identity Module: Cấu hình Spring Security, phân quyền và cấp phát JWT.
+[BE] Cấu hình Spring WebSocket & STOMP cho kiến trúc Realtime giao tiếp nội bộ.
+[FE] Khởi tạo cấu trúc dự án Mentee Web Client (Next.js/React).
+[FE] Khởi tạo cấu trúc dự án Admin & Mentor Dashboard.
 [AI] Khởi tạo khung mã nguồn độc lập FastAPI AI Service và cấu hình các route cơ bản.
 [AI] Xây dựng cấu trúc kho dữ liệu tri thức Knowledge Base và viết hàm nhúng dữ liệu đầu tiên.
-[DOCS] Hoàn thiện chi tiết đặc tả thiết kế cấu trúc bảng dữ liệu (Database Schema) bản sơ thảo.
+[DOCS] Hoàn thiện chi tiết đặc tả thiết kế cấu trúc bảng dữ liệu (Database Schema) bằng ERD.
 
 ```
 
@@ -615,63 +583,35 @@ Dưới đây là danh sách các Issue nền tảng cần được tạo lập 
 
 ## 17. Kịch Bản Nghiệm Thu & Demo Sản Phẩm
 
-### 17.1. Các bước thực hiện demo
-
-1. Triển khai kích hoạt toàn bộ hệ thống bằng một câu lệnh duy nhất thông qua Docker Compose để chứng minh hạ tầng sạch.
-2. Trình bày trang quản lý dự án trên GitHub hiển thị lịch sử phân chia Task minh bạch qua hệ thống Issues/Pull Requests.
-3. Show kết quả tự động chạy kiểm thử thành công của luồng GitHub Actions CI.
-4. Đăng nhập đồng thời 3 cửa sổ trình duyệt tương ứng với 3 vai trò: Học viên (Mentee), Cố vấn (Mentor) và Admin hệ thống.
-5. Thực hiện quy trình Mentor đăng ký tài khoản, đăng tải bảng điểm và xem AI thực hiện quét phân tích hồ sơ tự động.
-6. Admin phê duyệt tài khoản Mentor, Mentor thực hiện thiết lập biểu phí và bật nút sẵn sàng nhận cuộc gọi (Online).
-7. Học viên tìm kiếm môn học, tìm thấy Mentor, thực hiện lệnh gọi trực tuyến thời gian thực.
-8. Trình diễn màn hình đổ chuông, đồng ý kết nối và luồng đếm thời gian trừ tiền ví điện tử tự động sau mỗi block một phút.
-9. Thực hiện ngắt cuộc gọi, show hóa đơn giao dịch tài chính vừa tạo lập.
-10. Học viên đặt câu hỏi cho Trợ lý AI để truy xuất kiến thức môn học dựa trên tài liệu chuẩn đã nhúng sẵn.
-
-### 17.2. Các điểm mấu chốt cần làm nổi bật
-
-* Khả năng **tự động hóa và cô lập** các Module nghiệp vụ bên trong kiến trúc Backend Modular Monolith.
-* Tốc độ truyền tải tín hiệu và **đồng bộ trạng thái cuộc gọi trực tuyến** không độ trễ nhờ SignalR.
-* Sự chuẩn xác và **tính xác thực cao của câu trả lời từ AI RAG**, chứng minh không bị hiện tượng ảo tưởng thông tin nhờ có nguồn dữ liệu đối chiếu rõ ràng từ Vector Store.
-* Tính chuyên nghiệp của quy trình làm việc nhóm thể hiện qua lịch sử Git gọn gàng và hệ thống kiểm tra tự động DevOps.
+1. Triển khai toàn bộ hệ thống bằng Docker Compose để chứng minh hạ tầng sạch.
+2. Trình bày trang GitHub hiển thị lịch sử Issues/Pull Requests.
+3. Show kết quả tự động chạy kiểm thử thành công của luồng CI GitHub Actions (Maven Test).
+4. Đăng nhập đồng thời 3 vai trò: Học viên, Cố vấn và Admin.
+5. Thực hiện quy trình Mentor đăng ký tài khoản, đăng tải bảng điểm và xem AI phân tích hồ sơ tự động.
+6. Admin phê duyệt Mentor, Mentor thiết lập biểu phí và bật Online.
+7. Học viên tìm Mentor, thực hiện lệnh gọi trực tuyến thời gian thực.
+8. Trình diễn màn hình đổ chuông, đồng ý kết nối WebRTC và Job Scheduler (Spring `@Scheduled`) trừ tiền ví điện tử tự động sau mỗi 1 phút.
+9. Cúp máy, show hóa đơn giao dịch quyết toán tài chính lưu tại Database.
+10. Học viên đặt câu hỏi cho Trợ lý AI để truy xuất kiến thức dựa trên dữ liệu RAG.
 
 ---
 
 ## 18. Lộ Trình Nâng Cấp Và Phát Triển Tương Lai
 
-* Tách biệt hoàn toàn các Module có tần suất sử dụng cao (như Module Session và Module Wallet) thành các dịch vụ Microservices chạy độc lập khi quy mô người dùng tăng trưởng.
-* Tích hợp thêm hệ thống xếp hàng tin nhắn **RabbitMQ** để xử lý các tác vụ bất đồng bộ nặng như gửi email biên lai, ghi log hệ thống hoặc đẩy thông tin phân tích lịch sử cuộc gọi.
-* Triển khai chiến lược nâng cấp sản phẩm không gây gián đoạn hệ thống thông qua mô hình hình học **Blue/Green Deployment**.
-* Bổ sung công cụ giám sát hiệu năng chuyên sâu sử dụng bộ công nghệ Prometheus kết hợp Grafana để vẽ biểu đồ tài nguyên máy chủ.
-* Thực hiện kết nối trực tiếp với môi trường Sandbox của các cổng thanh toán thực tế phổ biến tại Việt Nam (MoMo, VNPAY).
-* Xây dựng cơ chế đánh giá nâng cao (Advanced RAG Metrics) sử dụng khung kiểm thử Ragas để đo lường độ chính xác của câu trả lời từ trợ lý trí tuệ nhân tạo.
+* Tách biệt module `wallet` và `session` thành Microservices độc lập sử dụng Spring Cloud khi quy mô hệ thống lớn.
+* Tích hợp Message Broker **RabbitMQ/Kafka** xử lý các tác vụ bất đồng bộ nặng (Gửi mail biên lai, log cuộc gọi).
+* Giám sát hiệu năng hệ thống chuyên sâu bằng Prometheus kết hợp Grafana, lấy metric từ Spring Boot Actuator.
+* Kết nối trực tiếp môi trường Sandbox của các cổng thanh toán Việt Nam (MoMo, VNPAY).
 
 ---
 
 ## 19. Văn Hóa Và Quy Tắc Phối Hợp Trong Nhóm
 
-Mọi thành viên trong dự án phải tuân thủ nghiêm ngặt quy trình vận hành khép kín dưới đây để đảm bảo chất lượng đồ án:
-
-```text
-Tiếp nhận Issue được giao 
-→ Tự động tạo Branch cá nhân từ develop (feature/issue-*)
-→ Thực hiện viết mã nguồn và chạy kiểm thử tại máy local 
-→ Thực hiện Commit mã nguồn với cú pháp chuẩn (feat:, fix:, docs:)
-→ Push nhánh lên kho lưu trữ chung trên GitHub 
-→ Khởi tạo Pull Request (PR) 
-→ Hệ thống GitHub Actions tự động kiểm tra điều kiện (CI)
-→ Chỉ định ít nhất 1 thành viên khác trong nhóm vào thực hiện Code Review
-→ Khắc phục các góp ý nếu có -> Tiến hành Merge code vào nhánh chung develop
-
-```
-
-**Các điều luật tối thượng của nhóm:**
-
-* Nghiêm cấm mọi hành vi thực hiện commit chỉnh sửa mã nguồn trực tiếp trên hai nhánh cốt lõi là `main` và `develop`.
-* Bất kỳ một sự thay đổi nào liên quan đến cấu trúc trả về của API bắt buộc phải thảo luận với nhóm và thực hiện cập nhật ngay vào tệp tài liệu contract `docs/api-contract.md`.
-* Nếu có chỉnh sửa, thêm bớt các trường dữ liệu hoặc các bảng trong Database, lập tức phải cập nhật sơ đồ tại file `docs/db-schema.md`.
-* Tuyệt đối không bao giờ được phép để lộ tệp cấu hình `.env` chứa mật khẩu thật lên Git. Mọi thông tin cấu hình mẫu chỉ được phép viết vào tệp `.env.example`.
-* Mỗi Pull Request khi gửi đi bắt buộc phải ghi rõ kịch bản test và đính kèm hình ảnh hoặc video minh chứng tính năng đã chạy thành công tại máy cá nhân.
+* Nghiêm cấm commit trực tiếp lên `main` và `develop`.
+* Bất kỳ thay đổi cấu trúc API nào phải được cập nhật vào `docs/api-contract.md`.
+* Chỉnh sửa bảng Database Entity (JPA) phải cập nhật sơ đồ `docs/db-schema.md`.
+* Chỉ ghi thông tin ảo vào `.env.example`.
+* Mỗi Pull Request gửi đi phải kèm hình ảnh/video minh chứng tính năng đã chạy thành công.
 
 ---
 
@@ -680,23 +620,20 @@ Tiếp nhận Issue được giao
 Kiến trúc mục tiêu tổng thể của đồ án:
 
 ```text
-Modular Monolith C# Backend + FastAPI AI RAG Service + Realtime SignalR Hub + Dockerized DevOps Pipeline
+Modular Monolith Java Spring Boot + FastAPI AI RAG + Realtime WebSocket STOMP + Dockerized CI/CD
 
 ```
 
-Phạm vi các tính năng lõi bắt buộc phải hoàn thiện để phục vụ cho buổi báo cáo nghiệm thu trước hội đồng:
+Phạm vi tính năng bắt buộc hoàn thiện cho buổi báo cáo:
 
 ```text
-- Chức năng đăng nhập, phân quyền người dùng và cấp phát JWT Token.
-- Trang cá nhân của Mentor, chức năng tải minh chứng và nút gạt trạng thái Online/Offline.
-- Hệ thống tìm kiếm, lọc danh sách Mentor trực tuyến dành cho Học viên.
-- Luồng đổ chuông cuộc gọi trực tuyến thời gian thực sử dụng SignalR Hub.
-- Trình mô phỏng tính phí theo phút (Micro-billing) và quyết toán ví điện tử khi cúp máy.
-- Giao diện Dashboard thống kê biểu đồ doanh thu và quản lý duyệt hồ sơ dành cho Admin.
-- Trợ lý học tập thông minh AI RAG thực hiện trả lời câu hỏi dựa trên tài liệu giáo trình chuẩn của nhà trường.
-- Đóng gói toàn bộ mã nguồn chạy ổn định qua Docker Compose và luồng CI tự động của GitHub Actions.
+- Đăng nhập, phân quyền, xác thực bằng Spring Security JWT.
+- Trang hồ sơ Mentor, nút bật/tắt Online.
+- Tìm kiếm, lọc danh sách Mentor trực tuyến.
+- Luồng cuộc gọi WebRTC điều phối qua Spring WebSocket.
+- Job Scheduler mô phỏng tính phí theo phút và quyết toán ví.
+- Dashboard thống kê và kiểm duyệt cho Admin.
+- Trợ lý AI RAG trả lời kiến thức nền tảng giáo trình.
+- Đóng gói Docker toàn bộ hệ thống.
 
 ```
-
----
-
