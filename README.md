@@ -9,7 +9,7 @@
 
 ## 1. Mô Tả Tổng Quan Dự Án
 
-Hệ thống **Mentor Hub** là một nền tảng công nghệ số toàn diện nhằm giải quyết các bài toán khó, hỗ trợ ôn thi cấp tốc và định hướng lộ trình nghề nghiệp cá nhân hóa cho sinh viên. Hệ thống kết nối trực tiếp sinh viên (Mentee) với các cố vấn (Mentor) là những cựu sinh viên xuất sắc, thủ khoa hoặc chuyên gia đang đi làm.
+Hệ thống **Mentor Hub** là một nền tảng công nghệ số toàn diện nhằm giải quyết các bài toán khó, hỗ trợ ôn thi cấp tốc và định hướng lộ trình nghề nghiệp cá nhân hóa cho sinh viên. Hệ thống kết nối trực tiếp sinh viên ( với các cố vấn là những cựu sinh viên xuất sắc, thủ khoa hoặc chuyên gia đang đi làm.
 
 Dự án tập trung vào ba trục công nghệ lõi:
 
@@ -36,7 +36,7 @@ Hệ thống hướng tới việc hiện thực hóa các mục tiêu sau:
 
 ## 3. Phân Rã Chức Năng Nghiệp Vụ
 
-### 3.1. Nhóm Chức Năng Cho Học Viên (Mentee)
+### 3.1. Nhóm Chức Năng Cho Học Viên 
 
 * Khám phá danh mục môn học và cây kỹ năng chuyên ngành.
 * Tìm kiếm nâng cao và lọc bộ lọc Mentor theo: chuyên môn, mức phí/phút, xếp hạng (số sao) và trạng thái hoạt động (Online/Offline).
@@ -78,7 +78,7 @@ Hệ thống hướng tới việc hiện thực hóa các mục tiêu sau:
 * Thực hiện quyết toán khi phiên học kết thúc: Khấu trừ tiền từ ví Mentee, thực hiện cắt chiết khấu sàn (ví dụ: 20%) và chuyển số tiền thực nhận còn lại vào ví Mentor.
 * Quản lý lịch sử giao dịch và sao kê tài chính minh bạch cho từng tài khoản.
 
-### 3.5. Chức Năng Dashboard Cho Ban Quản Trị (Admin)
+### 3.5. Chức Năng Dashboard Cho Admin
 
 * Xem bảng thống kê tổng quan về hiệu suất vận hành của toàn bộ nền tảng.
 * Giám sát số lượng phiên học đang diễn ra trực tuyến theo thời gian thực.
@@ -136,7 +136,7 @@ FastAPI AI RAG Service (Python)
 
 ## 5. Stack Công Nghệ Lựa Chọn
 
-### 5.1. Frontend (Giao Diện)
+### 5.1. Frontend
 
 * Framework chính: React.js hoặc Next.js (bản 14+)
 * Ngôn ngữ: TypeScript
@@ -147,7 +147,7 @@ FastAPI AI RAG Service (Python)
 * Kết nối thời gian thực: SignalR Client SDK
 * Truyền tải âm thanh/hình ảnh: WebRTC API / Agora SDK
 
-### 5.2. Backend (Máy Chủ Chính)
+### 5.2. Backend
 
 * Công nghệ cốt lõi: ASP.NET Core 8 / 9
 * Kiến trúc truy cập dữ liệu: Entity Framework Core (Code First)
@@ -158,7 +158,7 @@ FastAPI AI RAG Service (Python)
 * Ghi nhật ký hệ thống: Serilog xuất dữ liệu ra file và console
 * Tài liệu hóa API: Swagger / OpenAPI Specification
 
-### 5.3. AI Service (Trí Tuệ Nhân Tạo)
+### 5.3. AI Service
 
 * Ngôn ngữ: Python 3.11+
 * Web Framework: FastAPI
@@ -305,7 +305,7 @@ Học viên đặt câu hỏi cho AI RAG để tự ôn tập kiến thức nề
 
 ---
 
-## 9. Cơ Chế Xử Lý Thời Thực (Realtime Design)
+## 9. Cơ Chế Xử Lý Thời Thực 
 
 Tất cả các tương tác trực tiếp được thiết lập qua **SignalR Hub** nhằm đảm bảo độ trễ tối thiểu.
 
@@ -334,7 +334,7 @@ WalletBalanceUpdated       // Cập nhật biến động số dư tức thời 
 
 Khối dịch vụ AI Service chạy độc lập dưới dạng một REST API gọn nhẹ cấu hình bằng FastAPI.
 
-### 10.1. Kho tri thức nguồn (Knowledge Base)
+### 10.1. Kho tri thức nguồn
 
 ```text
 services/ai-service/knowledge_base/
@@ -469,7 +469,7 @@ uvicorn app.main:app --reload --port 8000
 
 ### 12.6. Cấu Hình Các Nhánh Frontend
 
-Khởi chạy Giao diện dành cho Học viên (Mentee):
+Khởi chạy Giao diện dành cho Học viên :
 
 ```bash
 cd frontend/mentee-web
@@ -593,9 +593,9 @@ Closes #10
 
 ---
 
-## 16. Kế Hoạch Khởi Tạo Các Khối Công Việc Ban Đầu (Issues)
+## 16. Kế Hoạch Khởi Tạo Các Khối Công Việc Ban Đầu 
 
-Dưới đây là danh sách các Issue nền tảng cần được tạo lập ngay trên GitHub để phân chia cho **nhóm 5 thành viên**:
+Dưới đây là danh sách các Issue nền tảng cần được tạo lập ngay trên GitHub để phân chia:
 
 ```text
 [ARCH] Thiết lập cấu trúc tài liệu kiến trúc tổng thể, API Contract và sơ đồ thực thể DB ban đầu.
@@ -648,7 +648,7 @@ Dưới đây là danh sách các Issue nền tảng cần được tạo lập 
 
 ---
 
-## 19. Văn Hóa Và Quy Tắc Phối Hợp Trong Đội Ngũ
+## 19. Văn Hóa Và Quy Tắc Phối Hợp Trong Nhóm
 
 Mọi thành viên trong dự án phải tuân thủ nghiêm ngặt quy trình vận hành khép kín dưới đây để đảm bảo chất lượng đồ án:
 
@@ -700,6 +700,3 @@ Phạm vi các tính năng lõi bắt buộc phải hoàn thiện để phục v
 
 ---
 
-## 21. Điều Khoản Sử Dụng & Bản Quyền (License)
-
-Dự án này được nghiên cứu, thiết kế và phát triển hoàn toàn độc lập bởi các thành viên trong nhóm phục vụ cho mục đích học thuật, làm bài tập lớn và hoàn thành đồ án tốt nghiệp môn học tại nhà trường. Mọi hành vi sao chép, trích dẫn một phần hoặc toàn bộ cấu trúc tài liệu này vào các mục đích thương mại khác đều phải có sự đồng ý bằng văn bản của các thành viên trong nhóm sáng lập.
