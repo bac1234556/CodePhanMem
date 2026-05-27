@@ -116,7 +116,7 @@ Spring Boot Backend - Modular Monolith (Java Multi-Module)
 ├── mentor-infrastructure (Hạ tầng: Spring Data JPA, Redis Cache, WebSocket Handler)
 └── mentor-domain (Nghiệp vụ lõi: Entities, Value Objects, Domain Interfaces)
         |
-        ├── PostgreSQL (Cơ sở dữ liệu quan hệ)
+        ├── MySQL (Cơ sở dữ liệu quan hệ)
         ├── Redis (Lưu trạng thái Online/Offline & Cache Session cuộc gọi)
         └── Spring WebSocket / STOMP Hub (Cổng truyền thông thời gian thực)
         |
@@ -146,9 +146,9 @@ FastAPI AI RAG Service (Python)
 
 ### 5.2. Backend
 
-* Công nghệ cốt lõi: Java 17 hoặc Java 21 / Spring Boot 3.x
+* Công nghệ cốt lõi: Java 25 / Spring Boot 3.x
 * Kiến trúc truy cập dữ liệu: Spring Data JPA (Hibernate) & Spring JDBC
-* Hệ quản trị cơ sở dữ liệu: PostgreSQL
+* Hệ quản trị cơ sở dữ liệu: MySQL
 * Xử lý Socket/Realtime: Spring WebSocket (STOMP Protocol)
 * Cơ chế bảo mật: Spring Security kết hợp JJWT (Java JWT) & Role-Based Authorization
 * Kiểm định dữ liệu đầu vào: Jakarta Bean Validation (Hibernate Validator)
@@ -174,7 +174,7 @@ FastAPI AI RAG Service (Python)
 * Máy chủ Proxy ngược: Nginx đảm nhận điều phối cổng và SSL
 * Kiểm tra sức khỏe hệ thống: Spring Boot Actuator (`/actuator/health`)
 * Hệ thống thông báo khẩn cấp: Telegram Bot API tích hợp luồng Deploy/Error
-* Tự động hóa sao lưu: Bash Script tự động backup định kỳ PostgreSQL
+* Tự động hóa sao lưu: Bash Script tự động backup định kỳ MySQL
 
 ---
 
@@ -358,7 +358,7 @@ GET  /health                       // Endpoint kiểm tra trạng thái sống c
 
 ### 11.1. Các thành phần hạ tầng
 * **Docker hóa**: 4 container chính: `mentor-backend-api` (build qua Maven/Jib), `mentor-ai-service`, `mentee-frontend`, `admin-mentor-frontend`.
-* **Hạ tầng bổ trợ**: Container `postgres:16-alpine` và `redis:7-alpine`.
+* **Hạ tầng bổ trợ**: Container `Mys:16-alpine` và `redis:7-alpine`.
 * **Nginx Proxy**: Phân luồng các request `/api` về Java Backend, `/ai` về Python Service, còn lại hướng về các nhánh Frontend.
 
 ### 11.2. Quy trình tích hợp liên tục CI
@@ -394,7 +394,7 @@ Khi code được hợp nhất thành công vào nhánh chính 'main'
 
 * Hệ thống quản lý mã nguồn: **Git**
 * Môi trường ảo hóa: **Docker Desktop**
-* Bộ phát triển phần mềm: **Java JDK 17 hoặc 21**
+* Bộ phát triển phần mềm: **Java JDK 25**
 * Trình quản lý gói Java: **Maven**
 * Môi trường chạy NodeJS: **Node.js LTS**
 * Ngôn ngữ AI: **Python 3.11+**
@@ -416,7 +416,7 @@ docker ps
 
 ```
 
-Đảm bảo `mentor-postgres` (5432) và `mentor-redis` (6379) đang chạy.
+Đảm bảo `mentor-Mys` (5432) và `mentor-redis` (6379) đang chạy.
 
 ### 12.4. Khởi Động Backend API (Java Spring Boot)
 
@@ -472,11 +472,11 @@ npm run dev
 Tạo tệp cấu hình `.env` tại thư mục gốc dựa trên mẫu `.env.example`:
 
 ```env
-# Cấu hình kết nối cơ sở dữ liệu quan hệ PostgreSQL
-POSTGRES_USER=mentor_admin
-POSTGRES_PASSWORD=mentor_secure_pass_2026
-POSTGRES_DB=mentor_hub_db
-POSTGRES_PORT=5432
+# Cấu hình kết nối cơ sở dữ liệu quan hệ MySQL
+MyS_USER=mentor_admin
+MyS_PASSWORD=mentor_secure_pass_2026
+MyS_DB=mentor_hub_db
+MyS_PORT=5432
 
 # Điểm neo cổng kết nối dịch vụ
 SPRING_SERVER_PORT=8080
@@ -567,8 +567,8 @@ Danh sách các Issue nền tảng cần phân chia ngay cho đội ngũ 5 thàn
 
 ```text
 [ARCH] Thiết lập cấu trúc Multi-Module Maven, file pom.xml cha và các pom.xml con.
-[DEVOPS] Khởi tạo tệp cấu hình Docker Compose thiết lập môi trường Postgres và Redis cho local.
-[BE] Thiết lập hệ thống cấu trúc gói (package) và kết nối Spring Data JPA với PostgreSQL.
+[DEVOPS] Khởi tạo tệp cấu hình Docker Compose thiết lập môi trường Mys và Redis cho local.
+[BE] Thiết lập hệ thống cấu trúc gói (package) và kết nối Spring Data JPA với MySQL.
 [BE] Xây dựng Identity Module: Cấu hình Spring Security, phân quyền và cấp phát JWT.
 [BE] Cấu hình Spring WebSocket & STOMP cho kiến trúc Realtime giao tiếp nội bộ.
 [FE] Khởi tạo cấu trúc dự án Mentee Web Client (Next.js/React).
